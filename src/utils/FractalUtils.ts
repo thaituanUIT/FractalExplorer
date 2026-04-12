@@ -32,8 +32,7 @@ export class FractalUtils {
         if (iteration === 0) return [p1, p2];
 
         const v = this.sub(p2, p1);
-        const s = this.mul(v, 0.25);
-        const perp = { x: -s.y, y: s.x };
+
 
         // F+F-F-FF+F+F-F logic
         // Minkowski Island generator trace (F+F-F-FF+F+F-F)
