@@ -125,10 +125,10 @@ const Info: React.FC<InfoProps> = ({
             </button>
 
             <div className="links">
-                <a href="https://github.com/mhyrzt/KochSnowFlake#readme" target="_blank" rel="noreferrer">
+                <a href="https://github.com/thaituanUIT/FractalExplorer#readme" target="_blank" rel="noreferrer">
                     GitHub
                 </a>
-                <a href="https://www.linkedin.com/in/mhyrzt/" target="_blank" rel="noreferrer">
+                <a href="https://www.linkedin.com/in/cu-nguyen-huy-thai-tuan-628914336/" target="_blank" rel="noreferrer">
                     LinkedIn
                 </a>
             </div>
