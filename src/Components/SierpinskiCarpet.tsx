@@ -3,7 +3,7 @@ import { FractalUtils } from "../utils/FractalUtils";
 import { CommonFractalProps } from "../utils/types";
 import useWindowDimension from "../hooks/useWindowDimension";
 
-const SierpinskiCarpet: React.FC<CommonFractalProps> = ({ iteration }) => {
+const SierpinskiCarpet: React.FC<CommonFractalProps> = ({ iteration, zoom, pan }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { getCenter, getLength } = useWindowDimension();
 
@@ -14,10 +14,13 @@ const SierpinskiCarpet: React.FC<CommonFractalProps> = ({ iteration }) => {
         if (!ctx) return;
 
         const { x: cx, y: cy } = getCenter();
-        const L = getLength();
+        const L = getLength() * zoom;
         
-        const startX = cx - L / 2;
-        const startY = cy - L / 2;
+        const centerX = cx + pan.x * zoom;
+        const centerY = cy + pan.y * zoom;
+
+        const startX = centerX - L / 2;
+        const startY = centerY - L / 2;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "rgb(0, 255, 0)";
@@ -27,7 +30,8 @@ const SierpinskiCarpet: React.FC<CommonFractalProps> = ({ iteration }) => {
         for (const sq of squares) {
             ctx.fillRect(sq.x, sq.y, sq.size, sq.size);
         }
-    }, [iteration, getCenter, getLength]);
+    }, [iteration, zoom, pan, getCenter, getLength]);
+
 
     return (
         <canvas

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { FractalUtils } from "../utils/FractalUtils";
-import { CommonFractalProps } from "../utils/types";
+import { MandelbrotProps } from "../utils/types";
 
-const Mandelbrot: React.FC<CommonFractalProps> = ({ iteration }) => {
+const Mandelbrot: React.FC<MandelbrotProps> = ({ iteration, zoom, pan, pattern }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -16,41 +16,30 @@ const Mandelbrot: React.FC<CommonFractalProps> = ({ iteration }) => {
         const imageData = ctx.createImageData(width, height);
         const data = imageData.data;
 
-        // Mandelbrot range approx -2 to 1 in re, -1 to 1 in im
-        const zoom = Math.min(width, height) / 3;
-        const offsetX = width / 2 - zoom * 0.5;
-        const offsetY = height / 2;
+        const scale = (Math.min(width, height) / 3) * zoom;
+        const offsetX = width / 2 + pan.x * zoom;
+        const offsetY = height / 2 + pan.y * zoom;
 
-        // Increase maxIter with iteration prop
         const maxIter = 50 + iteration * 20;
 
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                const cx = (x - offsetX) / zoom;
-                const cy = (y - offsetY) / zoom;
+                const cx = (x - offsetX) / scale;
+                const cy = (y - offsetY) / scale;
 
-                const iter = FractalUtils.getEscapeTime(cx, cy, maxIter);
+                const { iteration: iter, magnitudeSq } = FractalUtils.getEscapeTime(cx, cy, maxIter);
+                const color = FractalUtils.getColor(iter, magnitudeSq, maxIter, pattern);
+                
                 const index = (y * width + x) * 4;
-
-                if (iter === maxIter) {
-                    data[index] = 0;
-                    data[index + 1] = 0;
-                    data[index + 2] = 0;
-                    data[index + 3] = 255;
-                } else {
-                    const hue = 120; // Green
-                    const brightness = (iter / maxIter) * 100;
-                    // Simple green fade
-                    data[index] = 0;
-                    data[index + 1] = Math.floor((iter / maxIter) * 255);
-                    data[index + 2] = 0;
-                    data[index + 3] = 255;
-                }
+                data[index] = color.r;
+                data[index + 1] = color.g;
+                data[index + 2] = color.b;
+                data[index + 3] = 255;
             }
         }
 
         ctx.putImageData(imageData, 0, 0);
-    }, [iteration]);
+    }, [iteration, zoom, pan, pattern]);
 
     return (
         <canvas
@@ -63,3 +52,4 @@ const Mandelbrot: React.FC<CommonFractalProps> = ({ iteration }) => {
 };
 
 export default Mandelbrot;
+

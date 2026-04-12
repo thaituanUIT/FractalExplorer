@@ -3,7 +3,7 @@ import { FractalUtils } from "../utils/FractalUtils";
 import { CommonFractalProps } from "../utils/types";
 import useWindowDimension from "../hooks/useWindowDimension";
 
-const Minkowski: React.FC<CommonFractalProps> = ({ iteration }) => {
+const Minkowski: React.FC<CommonFractalProps> = ({ iteration, zoom, pan }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { getCenter, getLength } = useWindowDimension();
 
@@ -14,14 +14,16 @@ const Minkowski: React.FC<CommonFractalProps> = ({ iteration }) => {
         if (!ctx) return;
 
         const { x: cx, y: cy } = getCenter();
-        const L = getLength();
+        const L = getLength() * zoom;
         
-        // Minkowski Island base is a square
+        const centerX = cx + pan.x * zoom;
+        const centerY = cy + pan.y * zoom;
+
         const halfL = L / 2;
-        const p1 = { x: cx - halfL, y: cy - halfL };
-        const p2 = { x: cx + halfL, y: cy - halfL };
-        const p3 = { x: cx + halfL, y: cy + halfL };
-        const p4 = { x: cx - halfL, y: cy + halfL };
+        const p1 = { x: centerX - halfL, y: centerY - halfL };
+        const p2 = { x: centerX + halfL, y: centerY - halfL };
+        const p3 = { x: centerX + halfL, y: centerY + halfL };
+        const p4 = { x: centerX - halfL, y: centerY + halfL };
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "rgb(0, 255, 0)";
@@ -42,7 +44,8 @@ const Minkowski: React.FC<CommonFractalProps> = ({ iteration }) => {
         drawSide(p4, p1);
         
         ctx.stroke();
-    }, [iteration, getCenter, getLength]);
+    }, [iteration, zoom, pan, getCenter, getLength]);
+
 
     return (
         <canvas

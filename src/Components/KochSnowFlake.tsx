@@ -1,28 +1,50 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import KSF from "../utils/KSF";
-import { Line } from "react-lineto";
 import useWindowDimension from "../hooks/useWindowDimension";
-import { KochSnowFlakeProps, LinePoints } from "../utils/types";
+import { KochSnowFlakeProps } from "../utils/types";
 
-const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse }) => {
+const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, zoom, pan }) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const { getCenter, getLength } = useWindowDimension();
 
-    const renderKSF = () => {
-        const getLine = (linePoints: LinePoints, key: number) => {
-            return <Line {...linePoints} key={key} borderColor="rgb(0, 255, 0)" />;
-        };
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-        const L = getLength();
-        const C = getCenter();
-        const S = KSF.getIeteration(L, C, iteration);
+        const { x: cx, y: cy } = getCenter();
+        const L = getLength() * zoom;
+        
+        const centerX = cx + pan.x * zoom;
+        const centerY = cy + pan.y * zoom;
 
+        // Note: KSF logic needs adjustment for zoom/pan or we just transform the context
+        const S = KSF.getIeteration(L, { x: centerX, y: centerY }, iteration);
         const base = inverse ? KSF.flip(S[0], S) : S;
         const linePoses = KSF.getLinesPositions(KSF.getSides(base));
-        const bottom = linePoses.map(getLine);
-        return bottom;
-    };
 
-    return <>{renderKSF()}</>;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "rgb(0, 255, 0)";
+        ctx.lineWidth = 1;
+        
+        ctx.beginPath();
+        for (const lp of linePoses) {
+            ctx.moveTo(lp.x0, lp.y0);
+            ctx.lineTo(lp.x1, lp.y1);
+        }
+        ctx.stroke();
+    }, [iteration, inverse, zoom, pan, getCenter, getLength]);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
+        />
+    );
 };
 
 export default KochSnowlake;
+

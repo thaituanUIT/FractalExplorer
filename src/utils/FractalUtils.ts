@@ -124,7 +124,7 @@ export class FractalUtils {
     }
 
     // Escape Time (Mandelbrot/Julia)
-    static getEscapeTime(cx: number, cy: number, maxIter: number, z0x: number = 0, z0y: number = 0, isJulia: boolean = false): number {
+    static getEscapeTime(cx: number, cy: number, maxIter: number, z0x: number = 0, z0y: number = 0, isJulia: boolean = false): { iteration: number, magnitudeSq: number } {
         let zx = isJulia ? cx : z0x;
         let zy = isJulia ? cy : z0y;
         const constantX = isJulia ? z0x : cx;
@@ -133,14 +133,66 @@ export class FractalUtils {
         for (let i = 0; i < maxIter; i++) {
             const x2 = zx * zx;
             const y2 = zy * zy;
-            if (x2 + y2 > 4) return i;
+            if (x2 + y2 > 4) return { iteration: i, magnitudeSq: x2 + y2 };
             zy = 2 * zx * zy + constantY;
             zx = x2 - y2 + constantX;
         }
-        return maxIter;
+        return { iteration: maxIter, magnitudeSq: 0 };
     }
 
-    static hslToRgb(h: number, s: number, l: number): string {
-        return `hsl(${h}, ${s}%, ${l}%)`;
+    static getColor(iter: number, magnitudeSq: number, maxIter: number, pattern: string): { r: number, g: number, b: number } {
+        if (iter === maxIter) return { r: 0, g: 0, b: 0 };
+
+        // Smooth coloring renormalization
+        const smoothIter = iter + 1 - Math.log(Math.log(Math.sqrt(magnitudeSq))) / Math.log(2);
+        const t = smoothIter / maxIter;
+
+        switch (pattern) {
+            case "Smooth":
+                return this.hslToRgbRaw((smoothIter * 5) % 360, 70, 50);
+            case "Fire":
+                return {
+                    r: Math.min(255, t * 500),
+                    g: Math.min(255, t * t * 1000),
+                    b: Math.min(255, t * t * t * 2000)
+                };
+            case "Ocean":
+                return {
+                    r: 0,
+                    g: Math.min(255, t * 200 + 50),
+                    b: Math.min(255, t * 500 + 100)
+                };
+            case "Psychedelic":
+                return {
+                    r: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 0)),
+                    g: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 2)),
+                    b: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 4))
+                };
+            case "Grayscale":
+                const v = Math.floor(255 * (1 - t));
+                return { r: v, g: v, b: v };
+            case "Classic":
+            default:
+                return {
+                    r: 0,
+                    g: Math.floor((iter / maxIter) * 255),
+                    b: 0
+                };
+        }
     }
+
+    static hslToRgbRaw(h: number, s: number, l: number): { r: number, g: number, b: number } {
+        s /= 100;
+        l /= 100;
+        const k = (n: number) => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = (n: number) =>
+            l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return {
+            r: Math.floor(255 * f(0)),
+            g: Math.floor(255 * f(8)),
+            b: Math.floor(255 * f(4))
+        };
+    }
+
 }

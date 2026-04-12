@@ -3,7 +3,7 @@ import { FractalUtils } from "../utils/FractalUtils";
 import { CommonFractalProps } from "../utils/types";
 import useWindowDimension from "../hooks/useWindowDimension";
 
-const SierpinskiTriangle: React.FC<CommonFractalProps> = ({ iteration }) => {
+const SierpinskiTriangle: React.FC<CommonFractalProps> = ({ iteration, zoom, pan }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { getCenter, getLength } = useWindowDimension();
 
@@ -14,13 +14,16 @@ const SierpinskiTriangle: React.FC<CommonFractalProps> = ({ iteration }) => {
         if (!ctx) return;
 
         const { x: cx, y: cy } = getCenter();
-        const L = getLength();
+        const L = getLength() * zoom;
         
+        const centerX = cx + pan.x * zoom;
+        const centerY = cy + pan.y * zoom;
+
         // Equilateral triangle
         const h = (L * Math.sqrt(3)) / 2;
-        const p1 = { x: cx, y: cy - (2/3) * h };
-        const p2 = { x: cx - L/2, y: cy + (1/3) * h };
-        const p3 = { x: cx + L/2, y: cy + (1/3) * h };
+        const p1 = { x: centerX, y: centerY - (2/3) * h };
+        const p2 = { x: centerX - L/2, y: centerY + (1/3) * h };
+        const p3 = { x: centerX + L/2, y: centerY + (1/3) * h };
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "rgb(0, 255, 0)";
@@ -36,7 +39,8 @@ const SierpinskiTriangle: React.FC<CommonFractalProps> = ({ iteration }) => {
             }
         }
         ctx.stroke();
-    }, [iteration, getCenter, getLength]);
+    }, [iteration, zoom, pan, getCenter, getLength]);
+
 
     return (
         <canvas
