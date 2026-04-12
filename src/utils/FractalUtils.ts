@@ -29,7 +29,9 @@ export class FractalUtils {
 
     // Minkowski Island
     static getMinkowskiPoints(p1: Position, p2: Position, iteration: number): Position[] {
-        if (iteration === 0) return [p1, p2];
+        if (iteration <= 0) return [p1, p2];
+        if (iteration > 8) iteration = 8; // Fail-safe limit
+
 
         const v = this.sub(p2, p1);
 
@@ -68,7 +70,9 @@ export class FractalUtils {
 
     // Sierpinski Triangle
     static getSierpinskiTriangle(a: Position, b: Position, c: Position, iteration: number): Position[][] {
-        if (iteration === 0) return [[a, b, c, a]];
+        if (iteration <= 0) return [[a, b, c, a]];
+        if (iteration > 10) iteration = 10; // Fail-safe limit
+
 
         const ab = this.mul(this.add(a, b), 0.5);
         const bc = this.mul(this.add(b, c), 0.5);
@@ -83,7 +87,9 @@ export class FractalUtils {
 
     // Sierpinski Carpet
     static getSierpinskiCarpet(x: number, y: number, size: number, iteration: number): {x: number, y: number, size: number}[] {
-        if (iteration === 0) return [{x, y, size}];
+        if (iteration <= 0) return [{x, y, size}];
+        if (iteration > 6) iteration = 6; // Fail-safe limit
+
 
         const newSize = size / 3;
         const result = [];

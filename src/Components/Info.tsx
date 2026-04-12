@@ -17,6 +17,26 @@ const Info: React.FC<InfoProps> = ({
 }) => {
     const isPixelFractal = currentFractal === FractalType.MandelbrotSet || currentFractal === FractalType.JuliaSet;
 
+    const getMaxIteration = (type: FractalType): number => {
+        switch (type) {
+            case FractalType.KochSnowflake: return 6;
+            case FractalType.MinkowskiIsland: return 4;
+            case FractalType.SierpinskiTriangle: return 8;
+            case FractalType.SierpinskiCarpet: return 5;
+            case FractalType.MandelbrotSet:
+            case FractalType.JuliaSet: return 10;
+            default: return 10;
+        }
+    };
+
+    const handleFractalChange = (type: FractalType) => {
+        const maxIter = getMaxIteration(type);
+        if (iteration > maxIter) {
+            setIteration(maxIter);
+        }
+        setFractal(type);
+    };
+
     return (
         <div className="info">
             <h2>Fractal Explorer</h2>
@@ -24,8 +44,9 @@ const Info: React.FC<InfoProps> = ({
             <label style={{ color: "rgb(0, 255, 0)", fontSize: "0.7rem", marginBottom: "5px", display: "block" }}>Select Fractal</label>
             <select 
                 value={currentFractal} 
-                onChange={(e) => setFractal(e.target.value as FractalType)}
+                onChange={(e) => handleFractalChange(e.target.value as FractalType)}
             >
+
                 {Object.values(FractalType).map((f) => (
                     <option key={f as string} value={f as string}>{f as string}</option>
                 ))}
@@ -54,9 +75,14 @@ const Info: React.FC<InfoProps> = ({
                     name="iteration"
                     type="number"
                     min={0}
-                    max={currentFractal === FractalType.KochSnowflake ? 6 : 10}
-                    onChange={({ target }) => setIteration(parseInt(target.value) || 0)}
+                    max={getMaxIteration(currentFractal)}
+                    onChange={({ target }) => {
+                        const val = parseInt(target.value) || 0;
+                        const max = getMaxIteration(currentFractal);
+                        setIteration(Math.min(val, max));
+                    }}
                 />
+
             </div>
 
             <div className="row">
