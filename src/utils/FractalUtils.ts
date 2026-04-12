@@ -36,36 +36,10 @@ export class FractalUtils {
         const perp = { x: -s.y, y: s.x };
 
         // F+F-F-FF+F+F-F logic
-        const points: Position[] = [p1];
-        let curr = p1;
-
-        // Trace the generator
-        const segments = [
-            s, // F
-            perp, // +F
-            this.mul(s, 1), // -F (just indicating direction change)
-            this.mul(perp, -1), // -F
-            this.mul(s, 2), // FF
-            perp, // +F
-            this.mul(s, 1), // +F
-            this.mul(perp, -1), // -F (wait, this is getting confusing with relative coords)
-        ];
-        
-        // Let's use absolute relative vectors for the generator
-        // Path: (0,0) -> (1,0) -> (1,1) -> (2,1) -> (2,-1) -> (3,-1) -> (3,0) -> (4,0)
-        // Normalized by 4.
-        const path = [
-            { x: 0.25, y: 0 },
-            { x: 0, y: 0.25 },
-            { x: 0.25, y: 0 },
-            { x: 0, y: -0.5 },
-            { x: 0.25, y: 0 },
-            { x: 0, y: 0.25 },
-            { x: 0.25, y: 0 }
-        ];
-        // Wait, that's 7 segments. The 8 segment one is:
+        // Minkowski Island generator trace (F+F-F-FF+F+F-F)
+        // Normalized relative vectors for the generator:
         // (0,0) -> (0.25,0) -> (0.25,0.25) -> (0.5,0.25) -> (0.5,0) -> (0.5,-0.25) -> (0.75,-0.25) -> (0.75,0) -> (1,0)
-        // Segments: 1: (0.25,0), 2: (0, 0.25), 3: (0.25,0), 4: (0, -0.25), 5: (0, -0.25), 6: (0.25, 0), 7: (0, 0.25), 8: (0.25, 0)
+
         
         const relativeSegments = [
             { x: 0.25, y: 0 },
