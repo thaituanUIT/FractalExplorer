@@ -1,0 +1,88 @@
+* {
+    font-family: "Roboto Mono";
+    background-color: black;
+    color: white;
+}
+
+h2 {
+    text-align: center;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: absolute;
+    width: 320px;
+    height: auto;
+    padding: 20px;
+    top: 2.5%;
+    left: 2.5%;
+    font-size: smaller;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    z-index: 100;
+}
+
+.info h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: rgb(0, 255, 0);
+    font-size: 1.2rem;
+    text-align: left;
+}
+
+.info select {
+    background: black;
+    color: rgb(0, 255, 0);
+    border: 1px solid rgb(0, 255, 0);
+    padding: 8px;
+    margin-bottom: 20px;
+    font-family: inherit;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.info .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+}
+
+.info .row:last-of-type {
+    border-bottom: none;
+}
+
+.info input[type="number"] {
+    width: 50px;
+    background: transparent;
+    border: 1px solid rgb(0, 255, 0);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+.info input[type="range"] {
+    width: 120px;
+    accent-color: rgb(0, 255, 0);
+}
+
+.info a {
+    color: rgb(0, 255, 0);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
