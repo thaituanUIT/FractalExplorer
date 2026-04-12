@@ -14,6 +14,15 @@ class KSF {
         };
     }
 
+    static add(p1: Position, p2: Position): Position {
+        return { x: p1.x + p2.x, y: p1.y + p2.y };
+    }
+
+    static sub(p1: Position, p2: Position): Position {
+        return { x: p1.x - p2.x, y: p1.y - p2.y };
+    }
+
+
     static getAngle(p1: Position, p2: Position): number {
         const dx: number = p1.x - p2.x;
         const dy: number = p1.y - p2.y;
@@ -135,26 +144,27 @@ class KSF {
     }
 
     static getRhombusSides(positions: ArrayPosition): ArrayPosition {
+        const first = positions[0];
         const last = positions[positions.length - 1];
 
-        // Construction of a 60/120 rhombus using 4 identical curves
-
-        // Side 1: A -> B
+        // s1: Side 1 (A -> B)
         const s1 = positions;
-        
-        // Side 2: B -> C (Rotate side 1 by 120 degrees around B)
-        const s2 = this.rotateAllAround(last, positions, (2 * Math.PI) / 3);
+
+        // s2: Side 2 (B -> C) - Rotate base by 60 deg and translate to B
+        const s2 = positions.map(p => this.add(last, this.rotatePosition(this.sub(p, first), Math.PI / 3)));
         const v2 = s2[s2.length - 1];
-        
-        // Side 3: C -> D (Rotate side 1 by 180 degrees around C)
-        const s3 = this.rotateAllAround(v2, positions, Math.PI);
+
+        // s3: Side 3 (C -> D) - Rotate base by 180 deg and translate to C
+        const s3 = positions.map(p => this.add(v2, this.rotatePosition(this.sub(p, first), Math.PI)));
         const v3 = s3[s3.length - 1];
-        
-        // Side 4: D -> A (Rotate side 1 by 300 degrees around D)
-        const s4 = this.rotateAllAround(v3, positions, (5 * Math.PI) / 3);
+
+        // s4: Side 4 (D -> A) - Rotate base by 240 deg and translate to D
+        const s4 = positions.map(p => this.add(v3, this.rotatePosition(this.sub(p, first), (4 * Math.PI) / 3)));
+
 
         return [...s1, ...s2, ...s3, ...s4];
     }
+
 
 }
 
