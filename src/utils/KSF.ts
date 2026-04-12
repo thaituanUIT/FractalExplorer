@@ -135,10 +135,10 @@ class KSF {
     }
 
     static getRhombusSides(positions: ArrayPosition): ArrayPosition {
-        const first = positions[0];
         const last = positions[positions.length - 1];
 
         // Construction of a 60/120 rhombus using 4 identical curves
+
         // Side 1: A -> B
         const s1 = positions;
         

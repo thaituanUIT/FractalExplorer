@@ -42,7 +42,8 @@ const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, curren
             ctx.lineTo(lp.x1, lp.y1);
         }
         ctx.stroke();
-    }, [iteration, inverse, zoom, pan, getCenter, getLength]);
+    }, [iteration, inverse, currentFractal, zoom, pan, getCenter, getLength]);
+
 
     return (
         <canvas
