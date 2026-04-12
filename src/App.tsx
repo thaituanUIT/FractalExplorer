@@ -61,8 +61,11 @@ function App() {
         const props = { iteration, zoom, pan };
         switch (currentFractal) {
             case FractalType.KochSnowflake:
-                return <KochSnowFlake {...props} inverse={inverse} />;
+            case FractalType.SiameseSnowflake:
+            case FractalType.AntiSiameseSnowflake:
+                return <KochSnowFlake {...props} inverse={inverse} currentFractal={currentFractal} />;
             case FractalType.MinkowskiIsland:
+
                 return <Minkowski {...props} />;
             case FractalType.SierpinskiTriangle:
                 return <SierpinskiTriangle {...props} />;

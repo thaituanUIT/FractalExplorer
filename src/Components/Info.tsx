@@ -19,8 +19,11 @@ const Info: React.FC<InfoProps> = ({
 
     const getMaxIteration = (type: FractalType): number => {
         switch (type) {
-            case FractalType.KochSnowflake: return 6;
+            case FractalType.KochSnowflake:
+            case FractalType.SiameseSnowflake:
+            case FractalType.AntiSiameseSnowflake: return 6;
             case FractalType.MinkowskiIsland: return 4;
+
             case FractalType.SierpinskiTriangle: return 8;
             case FractalType.SierpinskiCarpet: return 5;
             case FractalType.MandelbrotSet:

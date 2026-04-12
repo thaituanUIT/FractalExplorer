@@ -2,7 +2,10 @@ import React from "react";
 
 export enum FractalType {
     KochSnowflake = "Koch Snowflake",
+    SiameseSnowflake = "Siamese Snowflake",
+    AntiSiameseSnowflake = "Anti-Siamese Snowflake",
     MinkowskiIsland = "Minkowski Island",
+
     SierpinskiTriangle = "Sierpinski Triangle",
     SierpinskiCarpet = "Sierpinski Carpet",
     MandelbrotSet = "Mandelbrot Set",
@@ -40,7 +43,9 @@ interface CommonFractalProps {
 
 interface KochSnowFlakeProps extends CommonFractalProps {
     inverse: boolean;
+    currentFractal: FractalType;
 }
+
 
 interface JuliaProps extends CommonFractalProps {
     c: { re: number; im: number };

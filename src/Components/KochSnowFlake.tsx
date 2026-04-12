@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import KSF from "../utils/KSF";
 import useWindowDimension from "../hooks/useWindowDimension";
-import { KochSnowFlakeProps } from "../utils/types";
+import { KochSnowFlakeProps, FractalType } from "../utils/types";
 
-const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, zoom, pan }) => {
+const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, currentFractal, zoom, pan }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { getCenter, getLength } = useWindowDimension();
 
@@ -19,10 +19,18 @@ const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, zoom, 
         const centerX = cx + pan.x * zoom;
         const centerY = cy + pan.y * zoom;
 
-        // Note: KSF logic needs adjustment for zoom/pan or we just transform the context
+        const isSiamese = currentFractal === FractalType.SiameseSnowflake || currentFractal === FractalType.AntiSiameseSnowflake;
+        const isAntiSiamese = currentFractal === FractalType.AntiSiameseSnowflake;
+
         const S = KSF.getIeteration(L, { x: centerX, y: centerY }, iteration);
-        const base = inverse ? KSF.flip(S[0], S) : S;
-        const linePoses = KSF.getLinesPositions(KSF.getSides(base));
+        
+        // Anti-Siamese is the inward version of Siamese
+        const effectiveInverse = isAntiSiamese ? !inverse : inverse;
+        const base = effectiveInverse ? KSF.flip(S[0], S) : S;
+        
+        const finalPositions = isSiamese ? KSF.getRhombusSides(base) : KSF.getSides(base);
+        const linePoses = KSF.getLinesPositions(finalPositions);
+
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = "rgb(0, 255, 0)";
