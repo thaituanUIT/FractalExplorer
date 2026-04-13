@@ -22,7 +22,7 @@ const KochSnowlake: React.FC<KochSnowFlakeProps> = ({ iteration, inverse, curren
         const isSiamese = currentFractal === FractalType.SiameseSnowflake || currentFractal === FractalType.AntiSiameseSnowflake;
         const isAntiSiamese = currentFractal === FractalType.AntiSiameseSnowflake;
 
-        const S = KSF.getIeteration(L, { x: centerX, y: centerY }, iteration);
+        const S = KSF.getIteration(L, { x: centerX, y: centerY }, iteration);
         
         // Anti-Siamese is the inward version of Siamese
         const effectiveInverse = isAntiSiamese ? !inverse : inverse;

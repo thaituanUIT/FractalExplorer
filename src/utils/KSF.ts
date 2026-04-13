@@ -106,7 +106,7 @@ class KSF {
         return state;
     }
 
-    static getIeteration(l: number, c: Position, i: number): ArrayPosition {
+    static getIteration(l: number, c: Position, i: number): ArrayPosition {
         let current = KSF.getInitialState(l, c);
         for (let j = 0; j < i; j++) {
             current = KSF.nextIteration(current);

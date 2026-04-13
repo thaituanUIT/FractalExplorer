@@ -1,18 +1,15 @@
 # Fractal Explorer
 
-## installation
+## Installation
 
 ```bash
-git clone <repo-url>
-cd Snowflake
-npm i
+git clone https://github.com/thaituanUIT/FractalExplorer.git
+cd FractalExplorer
+npm install
 npm start
 ```
-
 ### Normal
-
-![N5N](screenshots/5N.PNG)
 
 ### Inverse
 
-![N5I](screenshots/5I.PNG)
+
