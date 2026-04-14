@@ -28,20 +28,15 @@ export class FractalUtils {
     }
 
     // Minkowski Island
-    static getMinkowskiPoints(p1: Position, p2: Position, iteration: number): Position[] {
-        if (iteration <= 0) return [p1, p2];
-        if (iteration > 8) iteration = 8; // Fail-safe limit
-
+    static getMinkowskiPoints(p1: Position, p2: Position, iteration: number, result: Position[] = []): Position[] {
+        if (iteration <= 0) {
+            result.push(p1);
+            return result;
+        }
+        if (iteration > 7) iteration = 7; // Safer limit for recursion
 
         const v = this.sub(p2, p1);
 
-
-        // F+F-F-FF+F+F-F logic
-        // Minkowski Island generator trace (F+F-F-FF+F+F-F)
-        // Normalized relative vectors for the generator:
-        // (0,0) -> (0.25,0) -> (0.25,0.25) -> (0.5,0.25) -> (0.5,0) -> (0.5,-0.25) -> (0.75,-0.25) -> (0.75,0) -> (1,0)
-
-        
         const relativeSegments = [
             { x: 0.25, y: 0 },
             { x: 0, y: 0.25 },
@@ -55,123 +50,126 @@ export class FractalUtils {
 
         const angle = Math.atan2(v.y, v.x);
         let lastP = p1;
-        const result: Position[] = [];
 
         for (const rel of relativeSegments) {
             const rotRel = this.rotate(this.mul(rel, this.dist(p1, p2)), angle);
             const nextP = this.add(lastP, rotRel);
-            const subPoints = this.getMinkowskiPoints(lastP, nextP, iteration - 1);
-            result.push(...subPoints.slice(0, -1));
+            this.getMinkowskiPoints(lastP, nextP, iteration - 1, result);
             lastP = nextP;
         }
-        result.push(p2);
         return result;
     }
 
     // Sierpinski Triangle
-    static getSierpinskiTriangle(a: Position, b: Position, c: Position, iteration: number): Position[][] {
-        if (iteration <= 0) return [[a, b, c, a]];
-        if (iteration > 10) iteration = 10; // Fail-safe limit
-
+    static getSierpinskiTriangle(a: Position, b: Position, c: Position, iteration: number, result: Position[][] = []): Position[][] {
+        if (iteration <= 0) {
+            result.push([a, b, c, a]);
+            return result;
+        }
+        if (iteration > 10) iteration = 10;
 
         const ab = this.mul(this.add(a, b), 0.5);
         const bc = this.mul(this.add(b, c), 0.5);
         const ca = this.mul(this.add(c, a), 0.5);
 
-        return [
-            ...this.getSierpinskiTriangle(a, ab, ca, iteration - 1),
-            ...this.getSierpinskiTriangle(ab, b, bc, iteration - 1),
-            ...this.getSierpinskiTriangle(ca, bc, c, iteration - 1),
-        ];
+        this.getSierpinskiTriangle(a, ab, ca, iteration - 1, result);
+        this.getSierpinskiTriangle(ab, b, bc, iteration - 1, result);
+        this.getSierpinskiTriangle(ca, bc, c, iteration - 1, result);
+        
+        return result;
     }
 
     // Sierpinski Carpet
-    static getSierpinskiCarpet(x: number, y: number, size: number, iteration: number): {x: number, y: number, size: number}[] {
-        if (iteration <= 0) return [{x, y, size}];
-        if (iteration > 6) iteration = 6; // Fail-safe limit
-
+    static getSierpinskiCarpet(x: number, y: number, size: number, iteration: number, result: {x: number, y: number, size: number}[] = []): {x: number, y: number, size: number}[] {
+        if (iteration <= 0) {
+            result.push({x, y, size});
+            return result;
+        }
+        if (iteration > 7) iteration = 7;
 
         const newSize = size / 3;
-        const result = [];
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
                 if (i === 1 && j === 1) continue;
-                result.push(...this.getSierpinskiCarpet(x + i * newSize, y + j * newSize, newSize, iteration - 1));
+                this.getSierpinskiCarpet(x + i * newSize, y + j * newSize, newSize, iteration - 1, result);
             }
         }
         return result;
     }
+    static getMinkowskiBuffer(l: number, iteration: number, isSausage: boolean): Float32Array {
+        const halfL = l / 2;
+        const p1 = { x: -halfL, y: -halfL };
+        const p2 = { x: halfL, y: -halfL };
+        const p3 = { x: halfL, y: halfL };
+        const p4 = { x: -halfL, y: halfL };
 
-    // Escape Time (Mandelbrot/Julia)
-    static getEscapeTime(cx: number, cy: number, maxIter: number, z0x: number = 0, z0y: number = 0, isJulia: boolean = false): { iteration: number, magnitudeSq: number } {
-        let zx = isJulia ? cx : z0x;
-        let zy = isJulia ? cy : z0y;
-        const constantX = isJulia ? z0x : cx;
-        const constantY = isJulia ? z0y : cy;
-
-        for (let i = 0; i < maxIter; i++) {
-            const x2 = zx * zx;
-            const y2 = zy * zy;
-            if (x2 + y2 > 4) return { iteration: i, magnitudeSq: x2 + y2 };
-            zy = 2 * zx * zy + constantY;
-            zx = x2 - y2 + constantX;
+        const s1 = this.getMinkowskiPoints(p1, p2, iteration, []);
+        s1.push(p2); // Append the target point
+        
+        let all: Position[];
+        if (isSausage) {
+            all = s1;
+        } else {
+            const s2 = this.getMinkowskiPoints(p2, p3, iteration, []);
+            s2.push(p3);
+            const s3 = this.getMinkowskiPoints(p3, p4, iteration, []);
+            s3.push(p4);
+            const s4 = this.getMinkowskiPoints(p4, p1, iteration, []);
+            s4.push(p1);
+            // Join strings while removing duplicates at joint positions
+            all = [...s1.slice(0, -1), ...s2.slice(0, -1), ...s3.slice(0, -1), ...s4.slice(0, -1), p1];
         }
-        return { iteration: maxIter, magnitudeSq: 0 };
+
+        const buffer = new Float32Array(all.length * 2);
+        for (let i = 0; i < all.length; i++) {
+            buffer[i * 2] = all[i].x;
+            buffer[i * 2 + 1] = all[i].y;
+        }
+        return buffer;
     }
 
-    static getColor(iter: number, magnitudeSq: number, maxIter: number, pattern: string): { r: number, g: number, b: number } {
-        if (iter === maxIter) return { r: 0, g: 0, b: 0 };
+    static getSierpinskiTriangleBuffer(l: number, iteration: number): Float32Array {
+        const h = (l * Math.sqrt(3)) / 2;
+        const p1 = { x: 0, y: -(2/3) * h };
+        const p2 = { x: -l/2, y: (1/3) * h };
+        const p3 = { x: l/2, y: (1/3) * h };
 
-        // Smooth coloring renormalization
-        const smoothIter = iter + 1 - Math.log(Math.log(Math.sqrt(magnitudeSq))) / Math.log(2);
-        const t = smoothIter / maxIter;
-
-        switch (pattern) {
-            case "Smooth":
-                return this.hslToRgbRaw((smoothIter * 5) % 360, 70, 50);
-            case "Fire":
-                return {
-                    r: Math.min(255, t * 500),
-                    g: Math.min(255, t * t * 1000),
-                    b: Math.min(255, t * t * t * 2000)
-                };
-            case "Ocean":
-                return {
-                    r: 0,
-                    g: Math.min(255, t * 200 + 50),
-                    b: Math.min(255, t * 500 + 100)
-                };
-            case "Psychedelic":
-                return {
-                    r: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 0)),
-                    g: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 2)),
-                    b: Math.floor(128 + 127 * Math.sin(0.1 * smoothIter + 4))
-                };
-            case "Grayscale":
-                const v = Math.floor(255 * (1 - t));
-                return { r: v, g: v, b: v };
-            case "Classic":
-            default:
-                return {
-                    r: 0,
-                    g: Math.floor((iter / maxIter) * 255),
-                    b: 0
-                };
+        const triangles = this.getSierpinskiTriangle(p1, p2, p3, iteration, []);
+        // Each triangle is 3 points. To draw filled triangles with gl.TRIANGLES, we need 3 points per triangle.
+        // The utility returns [[a,b,c,a], ...]
+        const buffer = new Float32Array(triangles.length * 3 * 2);
+        for (let i = 0; i < triangles.length; i++) {
+            const tri = triangles[i];
+            for (let j = 0; j < 3; j++) {
+                buffer[i * 6 + j * 2] = tri[j].x;
+                buffer[i * 6 + j * 2 + 1] = tri[j].y;
+            }
         }
+        return buffer;
     }
 
-    static hslToRgbRaw(h: number, s: number, l: number): { r: number, g: number, b: number } {
-        s /= 100;
-        l /= 100;
-        const k = (n: number) => (n + h / 30) % 12;
-        const a = s * Math.min(l, 1 - l);
-        const f = (n: number) =>
-            l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-        return {
-            r: Math.floor(255 * f(0)),
-            g: Math.floor(255 * f(8)),
-            b: Math.floor(255 * f(4))
-        };
+    static getSierpinskiCarpetBuffer(l: number, iteration: number): Float32Array {
+        const startX = -l / 2;
+        const startY = -l / 2;
+        const squares = this.getSierpinskiCarpet(startX, startY, l, iteration, []);
+        
+        // Each square is 2 triangles = 6 vertices
+        const buffer = new Float32Array(squares.length * 6 * 2);
+        for (let i = 0; i < squares.length; i++) {
+            const sq = squares[i];
+            const x1 = sq.x, y1 = sq.y, x2 = sq.x + sq.size, y2 = sq.y + sq.size;
+            
+            // Triangle 1
+            buffer[i * 12 + 0] = x1; buffer[i * 12 + 1] = y1;
+            buffer[i * 12 + 2] = x2; buffer[i * 12 + 3] = y1;
+            buffer[i * 12 + 4] = x1; buffer[i * 12 + 5] = y2;
+            
+            // Triangle 2
+            buffer[i * 12 + 6] = x2; buffer[i * 12 + 7] = y1;
+            buffer[i * 12 + 8] = x2; buffer[i * 12 + 9] = y2;
+            buffer[i * 12 + 10] = x1; buffer[i * 12 + 11] = y2;
+        }
+        return buffer;
     }
 
 }

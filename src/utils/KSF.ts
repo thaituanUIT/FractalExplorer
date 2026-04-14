@@ -1,4 +1,4 @@
-import { Position, ArrayPosition, ArrayLinePoints } from "./types";
+import { Position, ArrayPosition } from "./types";
 
 class KSF {
     static getDistanceCenter(length: number): number {
@@ -41,20 +41,10 @@ class KSF {
         return [p1, p2];
     }
 
-    static validatePoistions(p1: Position, p2: Position) {
-        const { x: x1, y: y1 } = p1;
-        const { x: x2, y: y2 } = p2;
-
-        if (y2 !== y1) {
-            throw new Error("Positions should have same y value");
-        }
-
-        return { x1, x2, y: y1 };
-    }
 
     static getThrid(p1: Position, p2: Position, n: 1 | 2): Position {
-        const { x1, x2, y } = this.validatePoistions(p1, p2);
-        const x = ((3 - n) * x1 + n * x2) / 3;
+        const x = ((3 - n) * p1.x + n * p2.x) / 3;
+        const y = ((3 - n) * p1.y + n * p2.y) / 3;
         return { x, y };
     }
 
@@ -108,20 +98,47 @@ class KSF {
 
     static getIteration(l: number, c: Position, i: number): ArrayPosition {
         let current = KSF.getInitialState(l, c);
-        for (let j = 0; j < i; j++) {
+        const limit = 7; // match UI limit
+        const effectiveIter = Math.min(i, limit);
+        for (let j = 0; j < effectiveIter; j++) {
             current = KSF.nextIteration(current);
         }
         return current;
     }
 
-    static getLinesPositions(positions: ArrayPosition): ArrayLinePoints {
-        const linePoints: ArrayLinePoints = [];
-        for (let i = 0; i < positions.length - 1; i++) {
-            const { x: x0, y: y0 } = positions[i];
-            const { x: x1, y: y1 } = positions[i + 1];
-            linePoints.push({ x0, x1, y0, y1 });
+    static getIterationBuffer(l: number, i: number, type: "normal" | "rhombus", inverse: boolean): Float32Array {
+        // Center is 0,0 for the buffer
+        let positions = KSF.getIteration(l, { x: 0, y: 0 }, i);
+        
+        if (inverse) {
+            positions = KSF.flip(positions[0], positions);
         }
-        return linePoints;
+        
+        let finalPositions: ArrayPosition;
+        if (type === "rhombus") {
+            finalPositions = KSF.getRhombusSides(positions);
+        } else {
+            finalPositions = KSF.getSides(positions);
+        }
+
+        // Center the fractal based on its bounding box
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for (const p of finalPositions) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
+
+        const offsetX = (minX + maxX) / 2;
+        const offsetY = (minY + maxY) / 2;
+
+        const buffer = new Float32Array(finalPositions.length * 2);
+        for (let j = 0; j < finalPositions.length; j++) {
+            buffer[j * 2] = finalPositions[j].x - offsetX;
+            buffer[j * 2 + 1] = finalPositions[j].y - offsetY;
+        }
+        return buffer;
     }
 
     static flip(p: Position, positions: ArrayPosition) {

@@ -3,11 +3,8 @@ import React from "react";
 export enum FractalType {
     KochSnowflake = "Koch Snowflake",
     SiameseSnowflake = "Siamese Snowflake",
-    AntiSiameseSnowflake = "Anti-Siamese Snowflake",
     MinkowskiIsland = "Minkowski Island",
-
-    SierpinskiTriangle = "Sierpinski Triangle",
-    SierpinskiCarpet = "Sierpinski Carpet",
+    Sierpinski = "Sierpinski",
     MandelbrotSet = "Mandelbrot Set",
     JuliaSet = "Julia Set",
 }
@@ -19,6 +16,11 @@ export enum FractalPattern {
     Ocean = "Ocean",
     Psychedelic = "Psychedelic",
     Grayscale = "Grayscale",
+}
+
+export enum SierpinskiVariant {
+    Triangle = "Triangle",
+    Carpet = "Carpet",
 }
 
 interface Position {
@@ -43,13 +45,17 @@ interface CommonFractalProps {
 
 interface KochSnowFlakeProps extends CommonFractalProps {
     inverse: boolean;
+    isAntiSiamese: boolean;
     currentFractal: FractalType;
 }
-
 
 interface JuliaProps extends CommonFractalProps {
     c: { re: number; im: number };
     pattern: FractalPattern;
+}
+
+interface MinkowskiProps extends CommonFractalProps {
+    isSausage: boolean;
 }
 
 interface MandelbrotProps extends CommonFractalProps {
@@ -69,6 +75,12 @@ interface InfoProps {
     setZoom: (z: number) => void;
     pattern: FractalPattern;
     setPattern: (p: FractalPattern) => void;
+    isSausage: boolean;
+    setIsSausage: (s: boolean) => void;
+    isAntiSiamese: boolean;
+    setIsAntiSiamese: (s: boolean) => void;
+    sierpinskiVariant: SierpinskiVariant;
+    setSierpinskiVariant: (v: SierpinskiVariant) => void;
     resetView: () => void;
 }
 
@@ -83,6 +95,6 @@ export type {
     CommonFractalProps,
     JuliaProps,
     MandelbrotProps,
+    MinkowskiProps,
     InfoProps,
 };
-

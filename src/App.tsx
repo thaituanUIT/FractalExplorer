@@ -6,7 +6,7 @@ import SierpinskiCarpet from "./Components/SierpinskiCarpet";
 import Mandelbrot from "./Components/Mandelbrot";
 import Julia from "./Components/Julia";
 import Info from "./Components/Info";
-import { FractalType, FractalPattern } from "./utils/types";
+import { FractalType, FractalPattern, SierpinskiVariant } from "./utils/types";
 import "./App.css";
 
 function App() {
@@ -16,6 +16,9 @@ function App() {
     const [juliaC, setJuliaC] = React.useState<{ re: number; im: number }>({ re: -0.8, im: 0.156 });
     const [zoom, setZoom] = React.useState<number>(1);
     const [pan, setPan] = React.useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [isSausage, setIsSausage] = React.useState<boolean>(false);
+    const [isAntiSiamese, setIsAntiSiamese] = React.useState<boolean>(false);
+    const [sierpinskiVariant, setSierpinskiVariant] = React.useState<SierpinskiVariant>(SierpinskiVariant.Triangle);
     const [pattern, setPattern] = React.useState<FractalPattern>(FractalPattern.Classic);
 
     const resetView = () => {
@@ -62,15 +65,15 @@ function App() {
         switch (currentFractal) {
             case FractalType.KochSnowflake:
             case FractalType.SiameseSnowflake:
-            case FractalType.AntiSiameseSnowflake:
-                return <KochSnowFlake {...props} inverse={inverse} currentFractal={currentFractal} />;
+                return <KochSnowFlake {...props} inverse={inverse} currentFractal={currentFractal} isAntiSiamese={isAntiSiamese} />;
             case FractalType.MinkowskiIsland:
-
-                return <Minkowski {...props} />;
-            case FractalType.SierpinskiTriangle:
-                return <SierpinskiTriangle {...props} />;
-            case FractalType.SierpinskiCarpet:
-                return <SierpinskiCarpet {...props} />;
+                return <Minkowski {...props} isSausage={isSausage} />;
+            case FractalType.Sierpinski:
+                if (sierpinskiVariant === SierpinskiVariant.Triangle) {
+                    return <SierpinskiTriangle {...props} />;
+                } else {
+                    return <SierpinskiCarpet {...props} />;
+                }
             case FractalType.MandelbrotSet:
                 return <Mandelbrot {...props} pattern={pattern} />;
             case FractalType.JuliaSet:
@@ -103,6 +106,12 @@ function App() {
                 setZoom={setZoom}
                 pattern={pattern}
                 setPattern={setPattern}
+                isSausage={isSausage}
+                setIsSausage={setIsSausage}
+                isAntiSiamese={isAntiSiamese}
+                setIsAntiSiamese={setIsAntiSiamese}
+                sierpinskiVariant={sierpinskiVariant}
+                setSierpinskiVariant={setSierpinskiVariant}
                 resetView={resetView}
             />
         </div>

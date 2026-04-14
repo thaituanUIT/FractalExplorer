@@ -1,5 +1,5 @@
 import React from "react";
-import { InfoProps, FractalType, FractalPattern } from "../utils/types";
+import { InfoProps, FractalType, FractalPattern, SierpinskiVariant } from "../utils/types";
 
 const Info: React.FC<InfoProps> = ({
     setIteration,
@@ -13,6 +13,12 @@ const Info: React.FC<InfoProps> = ({
     zoom,
     pattern,
     setPattern,
+    isSausage,
+    setIsSausage,
+    isAntiSiamese,
+    setIsAntiSiamese,
+    sierpinskiVariant,
+    setSierpinskiVariant,
     resetView,
 }) => {
     const isPixelFractal = currentFractal === FractalType.MandelbrotSet || currentFractal === FractalType.JuliaSet;
@@ -20,23 +26,19 @@ const Info: React.FC<InfoProps> = ({
     const getMaxIteration = (type: FractalType): number => {
         switch (type) {
             case FractalType.KochSnowflake:
-            case FractalType.SiameseSnowflake:
-            case FractalType.AntiSiameseSnowflake: return 6;
-            case FractalType.MinkowskiIsland: return 4;
+            case FractalType.SiameseSnowflake: return 10;
+            case FractalType.MinkowskiIsland: return 6;
 
-            case FractalType.SierpinskiTriangle: return 8;
-            case FractalType.SierpinskiCarpet: return 5;
+            case FractalType.Sierpinski:
+                return sierpinskiVariant === SierpinskiVariant.Triangle ? 10 : 6;
             case FractalType.MandelbrotSet:
-            case FractalType.JuliaSet: return 10;
-            default: return 10;
+            case FractalType.JuliaSet: return 500;
+            default: return 100;
         }
     };
 
     const handleFractalChange = (type: FractalType) => {
-        const maxIter = getMaxIteration(type);
-        if (iteration > maxIter) {
-            setIteration(maxIter);
-        }
+        setIteration(0);
         setFractal(type);
     };
 
@@ -64,6 +66,23 @@ const Info: React.FC<InfoProps> = ({
                     >
                         {Object.values(FractalPattern).map((p) => (
                             <option key={p as string} value={p as string}>{p as string}</option>
+                        ))}
+                    </select>
+                </>
+            )}
+
+            {currentFractal === FractalType.Sierpinski && (
+                <>
+                    <label style={{ color: "rgb(0, 255, 0)", fontSize: "0.7rem", marginBottom: "5px", display: "block" }}>Sierpinski Variant</label>
+                    <select 
+                        value={sierpinskiVariant} 
+                        onChange={(e) => {
+                            setIteration(0);
+                            setSierpinskiVariant(e.target.value as SierpinskiVariant);
+                        }}
+                    >
+                        {Object.values(SierpinskiVariant).map((v) => (
+                            <option key={v as string} value={v as string}>{v as string}</option>
                         ))}
                     </select>
                 </>
@@ -102,6 +121,32 @@ const Info: React.FC<InfoProps> = ({
                         type="checkbox"
                         checked={inverse}
                         onChange={() => setInverse(!inverse)}
+                    />
+                </div>
+            )}
+
+            {currentFractal === FractalType.SiameseSnowflake && (
+                <div className="row">
+                    <label htmlFor="anti-siamese">Anti-Siamese</label>
+                    <input
+                        name="anti-siamese"
+                        id="anti-siamese"
+                        type="checkbox"
+                        checked={isAntiSiamese}
+                        onChange={() => setIsAntiSiamese(!isAntiSiamese)}
+                    />
+                </div>
+            )}
+
+            {currentFractal === FractalType.MinkowskiIsland && (
+                <div className="row">
+                    <label htmlFor="sausage">Sausage</label>
+                    <input
+                        name="sausage"
+                        id="sausage"
+                        type="checkbox"
+                        checked={isSausage}
+                        onChange={() => setIsSausage(!isSausage)}
                     />
                 </div>
             )}
@@ -165,6 +210,4 @@ const Info: React.FC<InfoProps> = ({
     );
 };
 
-
 export default Info;
-
