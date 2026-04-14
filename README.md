@@ -72,8 +72,20 @@ An interactive, high-performance web application for visualizing complex geometr
 
 ## 👤 Author
 
-**Tuan Thai**
+**Cu Nguyen Huy Thai Tuan**
+- MSSV: 23521704
+- Email: [EMAIL_ADDRESS](23521706@gm.uit.edu.vn)
 - GitHub: [@thaituanUIT](https://github.com/thaituanUIT)
+- LinkedIn: [Linked-in Profile](https://www.linkedin.com/in/cu-nguyen-huy-thai-tuan-628914336/)
+
+**Tran Trong Duc Tai**
+- MSSV: 23521379
+- Email: [EMAIL_ADDRESS](23521379@gm.uit.edu.vn)
+- GitHub: [@DucTai2804](https://github.com/DucTai2804)
+- LinkedIn: [Linked-in Profile](https://www.linkedin.com/in/trong-duc-tai/)
+
+**Nguyen Phu Thanh**
+- GitHub: [@NPTIsMyName](https://github.com/NPTIsMyName)
 - LinkedIn: [Linked-in Profile](https://www.linkedin.com/in/cu-nguyen-huy-thai-tuan-628914336/)
 
 ---
