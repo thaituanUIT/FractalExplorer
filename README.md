@@ -85,8 +85,8 @@ An interactive, high-performance web application for visualizing complex geometr
 - LinkedIn: [Tran Trong Duc Tai](https://www.linkedin.com/in/trong-duc-tai/)
 
 **Nguyen Phu Thanh**
-- MSSV: 23521402
-- Email: 23521402@gm.uit.edu.vn
+- MSSV: 23521452
+- Email: 23521452@gm.uit.edu.vn
 - GitHub: [@NPTIsMyName](https://github.com/NPTIsMyName)
 - LinkedIn: [Thanh Nguyen Phu](https://www.linkedin.com/in/thanhngphu)
 
